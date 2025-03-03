@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 
 	// "golang.org/x/crypto/bcrypt"
 	"encoding/json"
@@ -19,11 +20,13 @@ type loginPassword struct {
 }
 
 func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
-	template.Must(template.ParseFiles("web/html/auth.html")).Execute(w, nil)
+	cwd, _ := os.Getwd()
+	template.Must(template.ParseFiles(cwd + "/web/html/auth.html")).Execute(w, nil)
 }
 
 func RegisterPageHandler(w http.ResponseWriter, req *http.Request) {
-	template.Must(template.ParseFiles("web/html/register.html")).Execute(w, nil)
+	cwd, _ := os.Getwd()
+	template.Must(template.ParseFiles(cwd + "/web/html/register.html")).Execute(w, nil)
 }
 
 func LoginHandler(w http.ResponseWriter, req *http.Request) {

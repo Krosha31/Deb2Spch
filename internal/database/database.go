@@ -11,10 +11,10 @@ import (
 
 
 const (
-    host     = "localhost"
+    host     = "db"
     port     = 5432
-    user     = "postgres"
-    password = "0793"
+    user     = "user"
+    password = "1111"
     dbname   = "Deb2Spch"
 	filePath = "migrations/sql/"
 )
@@ -28,7 +28,8 @@ func (database *Database) NewDatabase() {
 }
 
 func (database *Database) executeFunctions() error {
-	files, err := os.ReadDir(filePath)
+	cwd, _ := os.Getwd()
+	files, err := os.ReadDir(cwd + "/" + filePath)
 	if err != nil {
 		return err
 	}
@@ -85,9 +86,9 @@ func (database *Database) connectToServer() error {
 }
 
 func (database *Database) Connect() error {
-	database.connectToServer()
-	database.executeFunctions()
-	database.createDB()
+	// database.connectToServer()
+	// database.executeFunctions()
+	// database.createDB()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 	host, port, user, password, dbname)
 	var err error
@@ -104,7 +105,7 @@ func (database *Database) Connect() error {
 	fmt.Printf("Connected to the %s\n", dbname)
 
 	database.executeFunctions()
-	err = database.createAllTables()
+	database.createAllTables()
 	database.AddSubscription(0)
 	return nil
 }

@@ -1,31 +1,31 @@
+# Этап сборки
 FROM golang:1.23 AS builder
 
 WORKDIR /app
 
+# Копируем go.mod и go.sum
 COPY go.mod go.sum ./
 RUN go mod download
 
+# Копируем все файлы приложения
 COPY . .
 
+# Компилируем приложение для Linux
 RUN CGO_ENABLED=0 GOOS=linux go build -o myapp cmd/app/main.go
 
+# Этап запуска
 FROM alpine:latest
 
+# Устанавливаем необходимые библиотеки
 RUN apk --no-cache add ca-certificates
 
-# FROM postgres:latest
-
-# ENV POSTGRES_DB=postgres
-# ENV POSTGRES_USER=root
-# ENV POSTGRES_PASSWORD=ChangeMe
-
-# COPY migrations/sql/init_database.sql /docker-entrypoint-initdb.d/
-
+# Копируем скомпилированное приложение из предыдущего этапа
 COPY --from=builder /app/myapp .
 
-# EXPOSE 5432
-# EXPOSE 8080
+# Копируем директорию web в контейнер
+COPY --from=builder /app/web /web
+COPY --from=builder /app/migrations /migrations
+COPY --from=builder /app/addons /addons
 
-# CMD ["sh", "-c", "docker-entrypoint.sh postgres & myapp"]
+# Указываем команду для запуска приложения
 CMD ["./myapp"]
-

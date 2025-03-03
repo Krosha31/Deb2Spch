@@ -9,12 +9,10 @@ import (
 	"Deb2Spch/internal/database"
 )
 
-
-
-var mainPageHtml = template.Must(template.ParseFiles("web/html/main.html"))
+var cwd string 
 
 func mainPageHandler(w http.ResponseWriter, r *http.Request) { 
-	mainPageHtml.Execute(w, nil)
+	template.Must(template.ParseFiles(cwd + "/web/html/main.html")).Execute(w, nil)
 }
 
 func main() {
@@ -25,19 +23,20 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
+	cwd, _ = os.Getwd()
 
 	mux := http.NewServeMux()
 
-	fs := http.FileServer(http.Dir("./web/css"))
+	fs := http.FileServer(http.Dir(cwd + "/web/css"))
     mux.Handle("/css/", http.StripPrefix("/css", fs))
 
-	fs = http.FileServer(http.Dir("addons"))
+	fs = http.FileServer(http.Dir(cwd + "/addons"))
     mux.Handle("/addons/", http.StripPrefix("/addons/", fs))
 
-	fs = http.FileServer(http.Dir("./web/scripts"))
+	fs = http.FileServer(http.Dir(cwd + "/web/scripts"))
     mux.Handle("/scripts/", http.StripPrefix("/scripts/", fs))
 
-	fs = http.FileServer(http.Dir("./web/common"))
+	fs = http.FileServer(http.Dir(cwd + "/web/common"))
     mux.Handle("/common/", http.StripPrefix("/common/", fs))
 
 

@@ -23,6 +23,11 @@ header {
     margin-right: 10px; /* Отступ справа, если нужно */
 }
 
+.user-icon {
+    width: 40px; /* Установите желаемую ширину */
+    margin-right: 10px; /* Отступ справа, если нужно */
+}
+
 nav ul {
     list-style-type: none;
     margin: 0;
@@ -101,4 +106,12 @@ button {
 
 button:hover {
     background-color: #5a0fb0;
+}
+
+.hidden {
+    display: none;
+}
+
+#error-message {
+    color: red;
 }

@@ -1,51 +1,86 @@
 package auth
 
 import (
+	"Deb2Spch/internal/common"
+	"Deb2Spch/internal/database"
+	// . "Deb2Spch/internal/common"
 	"fmt"
-	"net/http"
 	"html/template"
 	"io"
+	"net/http"
+
 	// "golang.org/x/crypto/bcrypt"
-	"time"
+	"encoding/json"
 )
 
-type user struct {
-	id 					int
-	login 				string 
-	password_hash 		string
-	subscribtion_id 	int
-	registration_date 	time.Time	
+type loginPassword struct {
+	Login    string
+	Password string
 }
 
-
 func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodPost {
-		body, err := io.ReadAll(req.Body)
-		if err != nil {
-			http.Error(w, "Ошибка чтения тела запроса", http.StatusInternalServerError)
-			return
-		}
-		defer req.Body.Close()
+	template.Must(template.ParseFiles("web/html/auth.html")).Execute(w, nil)
+}
 
-		fmt.Fprintf(w, "Полученные данные: %s\n", body)
-	} else {
-		template.Must(template.ParseFiles("web/html/auth.html")).Execute(w, nil)
-	}
-	
+func RegisterPageHandler(w http.ResponseWriter, req *http.Request) {
+	template.Must(template.ParseFiles("web/html/register.html")).Execute(w, nil)
 }
 
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("rth")
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(w, "Ошибка чтения тела запроса", http.StatusInternalServerError)
 		return
 	}
 	defer req.Body.Close()
-
-	fmt.Println(w, "Полученные данные: %s\n", body)
+	var jsonBody loginPassword
+	err = json.Unmarshal(body, &jsonBody)
+	if err != nil {
+		fmt.Errorf("Error unmarshalling JSON: %v", err)
+	}
+	user, err := database.Db.GetUserByLogin(jsonBody.Login)
+	if err != nil {
+		http.Error(w, "Error getting access to database", http.StatusInternalServerError)
+		return
+	}
+	if user == (common.User{}) {
+		http.Error(w, "User doesn't exist", http.StatusNotFound)
+		return 
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func RegisterHandler(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		http.Error(w, "Ошибка чтения тела запроса", http.StatusInternalServerError)
+		return
+	}
+	defer req.Body.Close()
+	var jsonBody loginPassword
+	err = json.Unmarshal(body, &jsonBody)
+	if err != nil {
+		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+	}
+
+	user, err := database.Db.GetUserByLogin(jsonBody.Login)
+	if err != nil {
+		http.Error(w, "Error getting access to database", http.StatusInternalServerError)
+	}
+	if user != (common.User{}) {
+		http.Error(w, "User already exists", http.StatusConflict)
+		return
+	}
 	
+	err = database.Db.AddUser(jsonBody.Login, jsonBody.Password)
+	if err != nil{
+		fmt.Println("database", err)
+		http.Error(w, "Error getting access to database", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

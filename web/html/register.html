@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <div id="header-container"></div>
+    <div class="container">
+        <h2>Registration</h2>
+        <div id="error-message"></div>
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div id="emailStep">
+                <div class="input-group"> 
+                    <label for="username">Ваш email</label>
+                    <input type="email" id="username" name="username" required>
+                </div>
+                <button type="submit">Далее</button>
+            </div>
+    
+            <div id="passwordStep" class="hidden">
+                <div class="input-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div class="input-group">
+                    <label for="passwordRepeat">Повторите пароль</label>
+                    <input type="password" id="passwordRepeat" name="passwordRepeat">
+                </div>
+                <button type="submit">Завершить регистрацию</button>
+            </div>
+        </form>
+    
+
+    <script src="/common/common.js"></script>
+    <script>
+        async function handleRegister(event) {
+            event.preventDefault();
+            const errorMessageElement = document.getElementById('error-message');
+            const emailStep = document.getElementById('emailStep');
+            if (!emailStep.classList.contains('hidden')) {
+                document.getElementById('emailStep').classList.add('hidden');
+                document.getElementById('passwordStep').classList.remove('hidden');
+                document.getElementById('password').required = true
+                document.getElementById('passwordRepeat').required = true
+            } else {
+                const login = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const passwordRepeat = document.getElementById('passwordRepeat').value;
+                console.log(password, passwordRepeat)
+                if (password !== passwordRepeat) {
+                    errorMessageElement.textContent = 'Passwords are not the same';
+                    return;
+                }
+
+                await fetch('http://localhost:3000/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ login, password }),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/';
+                        document.cookie = `user=${login}; path=/`;
+                    } else if (response.status == 409) {
+                        errorMessageElement.textContent = "User already exists";
+                    } else {
+                        errorMessageElement.textContent = 'Ошибка регистрации. Попробуйте еще раз.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+            }
+        }
+
+    </script>
+
+</body>
+</html>

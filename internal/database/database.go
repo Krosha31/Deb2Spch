@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	. "Deb2Spch/internal/common"
 	_ "github.com/lib/pq"
 )
 
@@ -104,7 +105,7 @@ func (database *Database) Connect() error {
 
 	database.executeFunctions()
 	err = database.createAllTables()
-	fmt.Println(err)
+	database.AddSubscription(0)
 	return nil
 }
 
@@ -113,3 +114,37 @@ func (database *Database) Disconnect() {
 	fmt.Println("Disconnected")
 	database.db.Close()
 }
+
+func (database *Database) AddUser(login string, password string) error {
+	query := "SELECT add_user($1, $2)"
+	_, err := database.db.Exec(query, login, password)
+    if err != nil {
+        return err
+    }
+	return nil;
+}
+
+func (database *Database) AddSubscription(duration int) error {
+	query := "SELECT add_suncription($1)"
+	_, err := database.db.Exec(query, duration)
+    if err != nil {
+        return err
+    }
+	return nil;
+}
+
+func (database *Database) GetUserByLogin(login string) (User, error) {
+	query := "SELECT * FROM get_user_by_login($1)"
+	var user User
+	err := database.db.QueryRow(query, login).Scan(&user.Email, &user.Password_hash, &user.Subscribtion_id, &user.Registration_date)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return User{}, nil
+        }
+        return User{}, err
+    }
+	return user, nil;
+}
+
+
+var Db Database;

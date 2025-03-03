@@ -18,9 +18,9 @@ func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	db := database.Database{}
-	db.Connect()
-	defer db.Disconnect()
+	database.Db = database.Database{}
+	database.Db.Connect()
+	defer database.Db.Disconnect()
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
@@ -44,6 +44,7 @@ func main() {
 	mux.HandleFunc("/", mainPageHandler)
 	mux.HandleFunc("/loginpage/", auth.LoginPageHandler)
 	mux.HandleFunc("/login/", auth.LoginHandler)
-	mux.HandleFunc("/register/", auth.LoginPageHandler)
+	mux.HandleFunc("/registerpage/", auth.RegisterPageHandler)
+	mux.HandleFunc("/register/", auth.RegisterHandler)
 	http.ListenAndServe(":" + port, mux)
 }

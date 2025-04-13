@@ -11,13 +11,85 @@
 <body>
     <div id="header-container"></div>
 
-    <main>
-        <h1>Добро пожаловать на нашу главную страницу!</h1>
-        <p>Здесь вы можете найти информацию о нас и наших услугах.</p>
-    </main>
+    <div class="dual-container">
+        <div class="upload-form">
+            <h2>Загрузите файл</h2>
+            <form id="uploadForm">
+                <label for="file-upload" class="file-upload-label">
+                    Перетащите файл сюда или нажмите, чтобы выбрать
+                    <input type="file" id="file-upload" />
+                </label>
+                <button type="submit">Загрузить</button>
+            </form>
+        </div>
+        <div class="info">
+            <h2>Информация</h2>
+            <p>Здесь будет информация о загружаемом файле.</p>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const uploadContainer = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('file-upload');
+
+            uploadContainer.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                uploadContainer.classList.add('dragover');
+            });
+
+            uploadContainer.addEventListener('dragleave', () => {
+                uploadContainer.classList.remove('dragover');
+            });
+
+            uploadContainer.addEventListener('drop', (event) => {
+                event.preventDefault();
+                uploadContainer.classList.remove('dragover');
+                const files = event.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            // Обработчик события для отправки формы
+            uploadForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Отменяем стандартное поведение формы
+                const files = fileInput.files; // Получаем файлы из input
+                handleFiles(files);
+            });
+
+        function handleFiles(file) {
+            if (file.length === 0) {
+                alert('Пожалуйста, выберите файл для загрузки.');
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('file', file[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                console.log(response.json())
+                return response.json(); 
+            })
+            .then(data => {
+                alert('Файл успешно загружен!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при загрузке файла.');
+            });
+        }
+    });
+</script>
+
 
     <footer>
-        <!-- Подвал сайта -->
     </footer>
     <script src="/common/common.js"></script>
 </body>

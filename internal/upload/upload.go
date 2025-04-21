@@ -8,7 +8,8 @@ import (
     "path/filepath"
 )
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
+func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Here")
     if r.Method != http.MethodPost {
         http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
         return
@@ -21,10 +22,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
     }
     defer file.Close()
 
-    username := r.FormValue("username")
+    username := r.FormValue("user")
     fmt.Printf("File upload by user: %s\n", username)
 
-    outFile, err := os.Create(filepath.Join("uploads", "uploaded_file")) // Замените на желаемое имя файла
+    outFile, err := os.Create(filepath.Join("uploads", "uploaded_file"))
     if err != nil {
         http.Error(w, "Error creating the file", http.StatusInternalServerError)
         return

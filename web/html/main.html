@@ -56,17 +56,20 @@
                 handleFiles(files);
             });
 
-        function handleFiles(file) {
+        async function handleFiles(file) {
             if (file.length === 0) {
                 alert('Пожалуйста, выберите файл для загрузки.');
                 return;
             }
 
+            const user = getCookie('user');
+
             const formData = new FormData();
 
             formData.append('file', file[0]);
+            formData.append('user', user)
 
-            fetch('/upload', {
+            await fetch('/upload/', {
                 method: 'POST',
                 body: formData,
             })
@@ -74,15 +77,15 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                console.log(response.json())
-                return response.json(); 
+                console.log(response)
+                return response; 
             })
             .then(data => {
                 alert('Файл успешно загружен!');
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Произошла ошибка при загрузке файла.');
+                alert('Error while file uploading');
             });
         }
     });

@@ -1,3 +1,5 @@
+const bootstrap = require('bootstrap')
+
 document.addEventListener("DOMContentLoaded", async function() {
     await fetch('/common/header.html')
         .then(response => response.text())

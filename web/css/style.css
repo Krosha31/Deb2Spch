@@ -18,10 +18,16 @@ header {
     padding: 10px 20px;
 }
 
-/* .logo {
-    font-size: 24px;
-    font-weight: bold;
-} */
+.custom-dropdown-size {
+    min-width: 140px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .custom-dropdown-size .dropdown-item {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.875rem;
+  }
 
 .logo img {
     width: 300px; /* Установите желаемую ширину */
@@ -38,6 +44,7 @@ nav ul {
     margin: 0;
     padding: 0;
     display: flex;
+    align-items: center;
 }
 
 nav ul li {
@@ -166,7 +173,7 @@ input[type="file"] {
 }
 
 input[type="file"] {
-    display: block;
+    display: none;
     margin: 20px 0;
 }
 

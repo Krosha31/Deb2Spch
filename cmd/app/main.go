@@ -48,5 +48,6 @@ func main() {
 	mux.HandleFunc("/registerpage/", auth.RegisterPageHandler)
 	mux.HandleFunc("/register/", auth.RegisterHandler)
 	mux.HandleFunc("/upload/", upload.UploadFileHandler)
+	mux.HandleFunc("/split/", upload.SplitHandler)
 	http.ListenAndServe(":" + port, mux)
 }

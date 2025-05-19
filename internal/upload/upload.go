@@ -6,10 +6,12 @@ import (
     "net/http"
     "os"
     "path/filepath"
+    "time"
 )
 
+
+
 func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Println("Here")
     if r.Method != http.MethodPost {
         http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
         return
@@ -23,9 +25,10 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
     defer file.Close()
 
     username := r.FormValue("user")
-    fmt.Printf("File upload by user: %s\n", username)
+    fileName := r.FormValue("name")
+    fmt.Printf("File %s  upload by user: %s\n", fileName,  username)
 
-    outFile, err := os.Create(filepath.Join("uploads", "uploaded_file"))
+    outFile, err := os.Create(filepath.Join("uploads", fileName))
     if err != nil {
         http.Error(w, "Error creating the file", http.StatusInternalServerError)
         return
@@ -39,4 +42,9 @@ func UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("File uploaded succesfuly"))
+}
+
+func SplitHandler(w http.ResponseWriter, r *http.Request) {
+    time.Sleep(15 * time.Second)
+    w.WriteHeader(http.StatusOK)
 }

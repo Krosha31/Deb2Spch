@@ -7,6 +7,7 @@ import (
 
 	"Deb2Spch/internal/auth"
 	"Deb2Spch/internal/database"
+	"Deb2Spch/internal/upload"
 )
 
 var cwd string 
@@ -16,6 +17,7 @@ func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	os.MkdirAll("uploads", os.ModePerm)
 	database.Db = database.Database{}
 	database.Db.Connect()
 	defer database.Db.Disconnect()
@@ -45,5 +47,7 @@ func main() {
 	mux.HandleFunc("/login/", auth.LoginHandler)
 	mux.HandleFunc("/registerpage/", auth.RegisterPageHandler)
 	mux.HandleFunc("/register/", auth.RegisterHandler)
+	mux.HandleFunc("/upload/", upload.UploadFileHandler)
+	mux.HandleFunc("/split/", upload.SplitHandler)
 	http.ListenAndServe(":" + port, mux)
 }

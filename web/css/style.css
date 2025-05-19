@@ -1,7 +1,12 @@
+html, body {
+    height: 100%; /* Устанавливаем высоту для html и body */
+    margin: 0; /* Убираем отступы */
+}
+
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(to right, #6a11cb, #2575fc);
-    margin: 0;
+
 }
 
 header {
@@ -13,10 +18,16 @@ header {
     padding: 10px 20px;
 }
 
-/* .logo {
-    font-size: 24px;
-    font-weight: bold;
-} */
+.custom-dropdown-size {
+    min-width: 140px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .custom-dropdown-size .dropdown-item {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.875rem;
+  }
 
 .logo img {
     width: 300px; /* Установите желаемую ширину */
@@ -33,6 +44,7 @@ nav ul {
     margin: 0;
     padding: 0;
     display: flex;
+    align-items: center;
 }
 
 nav ul li {
@@ -60,8 +72,8 @@ nav ul li a:hover {
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    width: 300px;
     margin: 50px auto; /* Центрирование контейнера */
+    width: 300px;
     text-align: center;
 }
 
@@ -114,4 +126,58 @@ button:hover {
 
 #error-message {
     color: red;
+}
+
+input[type="file"] {
+    display: none; /* Скрываем стандартный input */
+}
+
+.file-upload-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #6a11cb;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    margin-bottom: 20px;
+}
+
+.file-upload-label:hover {
+    background-color: rgba(106, 17, 203, 0.1);
+    border-color: #5a0fb0;
+}
+
+.dual-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    height: 70%;
+}
+
+.upload-form, .info {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 45%; /* Задаем ширину для обеих колонок */
+    height: 100%;
+}
+
+.upload-form h2, .info h2 {
+    margin-top: 0;
+}
+
+input[type="file"] {
+    display: none;
+    margin: 20px 0;
+}
+
+
+.info p {
+    line-height: 1.6;
 }

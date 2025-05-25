@@ -3,9 +3,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
-        const user = getCookie('user');
 
-        if (user) {
+        const accessToken = localStorage.getItem("token");
+        console.log(accessToken, isTokenValid(accessToken))
+        if (accessToken && isTokenValid(accessToken)) {
             const loginItem = document.getElementById('login-item');
             console.log(loginItem)
             loginItem.innerHTML = `
@@ -25,11 +26,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (logoutBtn) {
             logoutBtn.addEventListener("click", function (e) {
                 e.preventDefault();
-                // Удаляем все куки
-                document.cookie.split(";").forEach(cookie => {
-                    const name = cookie.split("=")[0].trim();
-                    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-                });
+                localStorage.removeItem("token");
                 window.location.href = "/";
             });
         }
@@ -37,6 +34,16 @@ document.addEventListener("DOMContentLoaded", async function() {
 });
 
 
+function isTokenValid(token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const exp = payload.exp;
+      const now = Math.floor(Date.now() / 1000);
+      return exp > now;
+    } catch (e) {
+      return false;
+    }
+  }
 
 
 function getCookie(name) {
@@ -56,3 +63,26 @@ function clearCookies() {
     window.location.href = '/';
 }
 
+
+
+function validatePassword(password) {
+    const minLength = 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+        return "Пароль должен содержать хотя бы 10 символов.";
+    }
+    if (!hasUpperCase) {
+        return "Пароль должен содержать хотя бы одну заглавную букву.";
+    }
+    if (!hasLowerCase) {
+        return "Пароль должен содержать хотя бы одну строчную букву.";
+    }
+    if (!hasSpecialChar) {
+        return "Пароль должен содержать хотя бы один специальный символ.";
+    }
+
+    return "";
+}

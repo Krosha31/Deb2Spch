@@ -6,7 +6,8 @@ BEGIN
         email varchar(200) PRIMARY KEY,
         password_hash varchar(200),
         subscribtion_id integer DEFAULT 1,
-        registration_date date DEFAULT CURRENT_DATE
+        registration_date date DEFAULT CURRENT_DATE,
+        free_minutes integer DEFAULT 10
     );
 
     CREATE TABLE IF NOT EXISTS subscriptions (  

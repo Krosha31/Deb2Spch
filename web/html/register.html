@@ -38,46 +38,61 @@
     <script src="/common/common.js"></script>
     <script>
         async function handleRegister(event) {
-            event.preventDefault();
-            const errorMessageElement = document.getElementById('error-message');
-            const emailStep = document.getElementById('emailStep');
-            if (!emailStep.classList.contains('hidden')) {
-                document.getElementById('emailStep').classList.add('hidden');
-                document.getElementById('passwordStep').classList.remove('hidden');
-                document.getElementById('password').required = true
-                document.getElementById('passwordRepeat').required = true
-            } else {
-                const login = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const passwordRepeat = document.getElementById('passwordRepeat').value;
-                console.log(password, passwordRepeat)
-                if (password !== passwordRepeat) {
-                    errorMessageElement.textContent = 'Passwords are not the same';
-                    return;
-                }
+    event.preventDefault();
+    const errorMessageElement = document.getElementById('error-message');
+    const emailStep = document.getElementById('emailStep');
 
-                await fetch('/register/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ login, password }),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/';
-                        document.cookie = `user=${login}; path=/`;
-                    } else if (response.status == 409) {
-                        errorMessageElement.textContent = "User already exists";
-                    } else {
-                        errorMessageElement.textContent = 'Ошибка регистрации. Попробуйте еще раз.';
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                });
-            }
+    if (!emailStep.classList.contains('hidden')) {
+        emailStep.classList.add('hidden');
+        document.getElementById('passwordStep').classList.remove('hidden');
+        document.getElementById('password').required = true;
+        document.getElementById('passwordRepeat').required = true;
+    } else {
+        const login = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const passwordRepeat = document.getElementById('passwordRepeat').value;
+
+        if (password !== passwordRepeat) {
+            errorMessageElement.textContent = 'Passwords are not the same';
+            return;
         }
+
+        const validationError = validatePassword(password);
+        if (validationError) {
+            errorMessageElement.textContent = validationError;
+            return;
+        }
+
+        try {
+            const response = await fetch('/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Чтобы сервер мог установить refresh токен в cookie
+                body: JSON.stringify({ login, password }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.token) {
+                    localStorage.setItem('token', data.token); // Сохраняем access токен
+                    window.location.href = '/';
+                } else {
+                    errorMessageElement.textContent = 'Сервер не вернул access токен.';
+                }
+            } else if (response.status === 409) {
+                errorMessageElement.textContent = "User already exists";
+            } else {
+                errorMessageElement.textContent = 'Ошибка регистрации. Попробуйте еще раз.';
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            errorMessageElement.textContent = 'Сбой подключения к серверу.';
+        }
+    }
+}
 
     </script>
 

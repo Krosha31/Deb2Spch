@@ -8,6 +8,7 @@ import (
 	"Deb2Spch/internal/auth"
 	"Deb2Spch/internal/database"
 	"Deb2Spch/internal/upload"
+	"github.com/joho/godotenv"
 )
 
 var cwd string 
@@ -17,6 +18,15 @@ func mainPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := godotenv.Load()
+    if err != nil {
+        return 
+    }
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		return
+	}
+	auth.JwtSecret = []byte(secret)
 	os.MkdirAll("uploads", os.ModePerm)
 	database.Db = database.Database{}
 	database.Db.Connect()
@@ -49,5 +59,6 @@ func main() {
 	mux.HandleFunc("/register/", auth.RegisterHandler)
 	mux.HandleFunc("/upload/", upload.UploadFileHandler)
 	mux.HandleFunc("/split/", upload.SplitHandler)
+	mux.HandleFunc("/refresh", auth.RefreshHandler)
 	http.ListenAndServe(":" + port, mux)
 }

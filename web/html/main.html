@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/deb2spch/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Deb2Spch</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
   <style>
     .dual-container {
         display: flex;
@@ -157,7 +158,7 @@
 
             const xhr = new XMLHttpRequest();
 
-            xhr.open('POST', '/upload/', true);
+            xhr.open('POST', 'upload/', true);
 
             // Показываем прогресс-бар
             const progressContainer = document.getElementById('progressContainer');
@@ -176,12 +177,19 @@
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
+                    const fileName = file[0].name;
+
                     document.getElementById('fileInfo').innerHTML = `
-                        <strong>Имя файла:</strong> ${file[0].name}<br>
+                        <strong id="filename">Имя файла:</strong> ${fileName}<br>
                         <strong>Размер файла:</strong> ${(file[0].size / (1024 * 1024)).toFixed(2)} МБ<br>
                     `;
                     progressBar.style.width = '100%';
                     progressBar.innerText = '100%';
+
+                    // Сохраняем в куки
+                    document.cookie = `filename=${encodeURIComponent(fileName)}; path=/; max-age=86400`;
+                    document.cookie = `user=${encodeURIComponent(user)}; path=/; max-age=86400`;
+
                     showSplitButton()
                 } else {
                     alert('Ошибка загрузки файла: ' + xhr.statusText);
@@ -208,14 +216,14 @@
     document.getElementById('progressContainer').style.display = 'none';
     document.getElementById('splitButton').style.display = 'none';
     document.getElementById('loadingSpinner').classList.remove('d-none');
-
+    console.log(document.getElementById("filename").innerText)
     try {
-        const response = await fetch('/split', {
+        const response = await fetch('split/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user: getCookie('user') }),
+            body: JSON.stringify({ "path": getCookie("filename") }),
         });
 
         if (!response.ok) throw new Error('Ошибка при разделении файла');
@@ -236,6 +244,6 @@
 
     <footer>
     </footer>
-    <script src="/common/common.js"></script>
+    <script src="common/common.js"></script>
 </body>
 </html>

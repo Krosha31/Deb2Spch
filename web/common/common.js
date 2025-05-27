@@ -1,21 +1,19 @@
 document.addEventListener("DOMContentLoaded", async function() {
-    await fetch('/common/header.html')
+    await fetch('/deb2spch/common/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-container').innerHTML = data;
 
         const accessToken = localStorage.getItem("token");
-        console.log(accessToken, isTokenValid(accessToken))
         if (accessToken && isTokenValid(accessToken)) {
             const loginItem = document.getElementById('login-item');
-            console.log(loginItem)
             loginItem.innerHTML = `
         <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="/addons/user-icon.png" alt="User" class="rounded-circle" width="48" height="48" style="object-fit: cover; vertical-align: middle;">
+                    <img src="addons/user-icon.png" alt="User" class="rounded-circle" width="48" height="48" style="object-fit: cover; vertical-align: middle;">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end custom-dropdown-size" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="/profile">Профиль</a></li>
+                    <li><a class="dropdown-item" href="profile/">Профиль</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Выйти</a></li>
                 </ul>
@@ -27,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             logoutBtn.addEventListener("click", function (e) {
                 e.preventDefault();
                 localStorage.removeItem("token");
-                window.location.href = "/";
+                window.location.href = "";
             });
         }
     });
@@ -46,10 +44,11 @@ function isTokenValid(token) {
   }
 
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+  function getCookie(name) {
+    const matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([$?*|{}()\[\]\\\/+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 
@@ -60,7 +59,7 @@ function clearCookies() {
         const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
     }
-    window.location.href = '/';
+    window.location.href = '';
 }
 
 

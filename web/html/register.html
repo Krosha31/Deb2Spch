@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <base href="/deb2spch/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -35,7 +36,7 @@
         </form>
     
 
-    <script src="/common/common.js"></script>
+    <script src="common/common.js"></script>
     <script>
         async function handleRegister(event) {
     event.preventDefault();
@@ -64,12 +65,12 @@
         }
 
         try {
-            const response = await fetch('/register/', {
+            const response = await fetch('register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // Чтобы сервер мог установить refresh токен в cookie
+                credentials: 'include',
                 body: JSON.stringify({ login, password }),
             });
 
@@ -77,8 +78,8 @@
                 const data = await response.json();
 
                 if (data.token) {
-                    localStorage.setItem('token', data.token); // Сохраняем access токен
-                    window.location.href = '/';
+                    localStorage.setItem('token', data.token);
+                    window.location.href = '';
                 } else {
                     errorMessageElement.textContent = 'Сервер не вернул access токен.';
                 }

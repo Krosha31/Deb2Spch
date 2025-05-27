@@ -4,10 +4,8 @@ import (
 	"Deb2Spch/internal/common"
 	"Deb2Spch/internal/database"
 	"fmt"
-	"html/template"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -37,7 +35,6 @@ func getTokens(login string) (string, string){
 	  }
 	  accessToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(JwtSecret)
 	
-	  // Refresh токен (длинный)
 	  refreshClaims := &Claims{
 		Login: login,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -76,16 +73,6 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"token": newAccessToken})
 }
 
-func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
-	cwd, _ := os.Getwd()
-	template.Must(template.ParseFiles(cwd + "/web/html/auth.html")).Execute(w, nil)
-}
-
-func RegisterPageHandler(w http.ResponseWriter, req *http.Request) {
-	cwd, _ := os.Getwd()
-	template.Must(template.ParseFiles(cwd + "/web/html/register.html")).Execute(w, nil)
-}
-
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -98,6 +85,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Errorf("Error unmarshalling JSON: %v", err)
 	}
+	fmt.Println(jsonBody.Login)
 	user, err := database.Db.GetUserByLogin(jsonBody.Login)
 	if err != nil {
 		http.Error(w, "Error getting access to database", http.StatusInternalServerError)
@@ -109,7 +97,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password_hash), []byte(jsonBody.Password))
 	if err != nil {
-		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		http.Error(w, "Invalid password", http.StatusNotFound)
 		return
 	}
 
@@ -121,7 +109,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		HttpOnly: true,
 		Secure:   false, // true на проде с HTTPS
 		SameSite: http.SameSiteStrictMode,
-		Path:     "/",
+		Path:     "/deb2spch/",
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 	})
 
@@ -175,7 +163,7 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		HttpOnly: true,
 		Secure:   false, // true на проде с HTTPS
 		SameSite: http.SameSiteStrictMode,
-		Path:     "/",
+		Path:     "/deb2spch/",
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
 	})
 

@@ -20,14 +20,30 @@ BEGIN
         log_id serial PRIMARY KEY,
         "action" text,
         "date" date DEFAULT CURRENT_DATE,
-        user_id varchar(200),
+        user_id varchar(200) NOT NULL,
         subscribtion_id integer
+    );
+
+    CREATE TABLE IF NOT EXISTS request (
+        id SERIAL PRIMARY KEY,
+        user_id varchar(200) NOT NULL,
+        time TIMESTAMP NOT NULL DEFAULT now(),
+        input TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS request_results (
+        id SERIAL PRIMARY KEY,
+        request_id INT NOT NULL,
+        "output" TEXT NOT NULL
     );
 
     ALTER TABLE users ADD FOREIGN KEY (subscribtion_id) REFERENCES subscriptions(id);  
     ALTER TABLE logs ADD FOREIGN KEY (user_id) REFERENCES users(email);  
 
     ALTER TABLE logs ADD FOREIGN KEY (subscribtion_id) REFERENCES subscriptions(id);  
+
+    ALTER TABLE request ADD FOREIGN KEY (user_id) REFERENCES users(email);
+    ALTER TABLE request_results ADD FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE;
 
 END;  
 $$ LANGUAGE plpgsql; 

@@ -7,12 +7,12 @@ async function handleLogin(event) {
     errorMessageElement.textContent = ""; 
 
     try {
-        const response = await fetch('/login/', {
+        const response = await fetch('login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include', // чтобы refresh токен в HttpOnly cookie дошел от сервера
+            credentials: 'include', 
             body: JSON.stringify({ login, password }),
         });
 
@@ -20,19 +20,19 @@ async function handleLogin(event) {
             const data = await response.json();
 
             if (data.token) {
-                localStorage.setItem('token', data.token); // access токен сохраняем
-                window.location.href = '/';
+                localStorage.setItem('token', data.token);
+                window.location.href = '';
             } else {
-                errorMessageElement.textContent = 'Сервер не вернул access токен.';
+                console.log('Сервер не вернул access токен.');
             }
         } else if (response.status === 404 || response.status === 401) {
-            errorMessageElement.textContent = "Неверный логин или пароль";
+            errorMessageElement.textContent = "Incorrect login or password";
         } else {
-            errorMessageElement.textContent = 'Ошибка авторизации. Попробуйте позже.';
+            errorMessageElement.textContent = 'Authorization failed. Try again later';
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        errorMessageElement.textContent = 'Ошибка соединения с сервером.';
+        errorMessageElement.textContent = 'Internal Server Error';
     }
 }
 

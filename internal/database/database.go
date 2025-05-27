@@ -11,7 +11,7 @@ import (
 
 
 const (
-    host     = "localhost"
+    host     = "db" //localhost
     port     = 5432
     user     = "user"
     password = "1111"
@@ -28,6 +28,7 @@ func (database *Database) NewDatabase() {
 }
 
 func (database *Database) executeFunctions() error {
+	fmt.Println("executed")
 	cwd, _ := os.Getwd()
 	files, err := os.ReadDir(cwd + "/" + filePath)
 	if err != nil {
@@ -104,8 +105,10 @@ func (database *Database) Connect() error {
 
 	fmt.Printf("Connected to the %s\n", dbname)
 
-	database.executeFunctions()
-	database.createAllTables()
+	error := database.executeFunctions()
+	fmt.Println(error)
+	error = database.createAllTables()
+	fmt.Println(error)
 	database.AddSubscription(0)
 	return nil
 }

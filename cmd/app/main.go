@@ -56,6 +56,7 @@ func main() {
 	mux.HandleFunc("/upload/", upload.UploadFileHandler)
 	mux.HandleFunc("/split/", upload.SplitHandler)
 	mux.HandleFunc("/refresh/", auth.RefreshHandler)
+	mux.HandleFunc("/download/", upload.DownloadHandler)
 
 	http.ListenAndServe(":" + port, mux)
 }

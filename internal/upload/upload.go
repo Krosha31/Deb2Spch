@@ -1,16 +1,17 @@
 package upload
 
 import (
-    "fmt"
-    "io"
-    "net/http"
-    "os"
-    "path/filepath"
-	"encoding/json"
-	"time"
-	"bytes"
+	// "Deb2Spch/internal/database"
 	"archive/zip"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 
@@ -127,7 +128,6 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Invalid JSON", http.StatusBadRequest)
         return
     }
-	fmt.Println("DownloadHandler second")
     if len(req.SeparatedPaths) == 0 {
         http.Error(w, "No files to download", http.StatusBadRequest)
         return
@@ -162,6 +162,8 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         fmt.Printf("Error sending file: %v\n", err)
     }
+
+	// database.Db.InsertRequest(req.User, req.OriginalFilename)
 }
 
 func createZipArchive(filePaths []string, originalFilename string) (string, error) {

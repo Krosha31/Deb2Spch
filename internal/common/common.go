@@ -11,3 +11,10 @@ type User struct {
 	Subscribtion_id   int
 	Registration_date time.Time
 }
+
+type Request struct {
+    ID     int
+    UserID string
+    Time   time.Time
+    Input  string
+}

@@ -57,7 +57,7 @@
                     <label for="file-upload" class="border border-primary border-2 rounded d-flex flex-column align-items-center justify-content-center p-4 text-secondary bg-light"
                            id="dropArea" style="height: 300px; cursor: pointer; transition: all 0.3s; margin-top: 30px; margin-bottom: 30px;">
                       <span id="dropAreaText">Перетащите файл сюда или нажмите, чтобы выбрать</span>
-                      <input type="file" id="file-upload" class="form-control-file d-none" required />
+                      <input type="file"  accept=".wav,.mp3" id="file-upload" class="form-control-file d-none" required />
                     </label>
                   </div>
                 <div class="d-flex justify-content-center gap-2">
@@ -101,11 +101,25 @@
 
 
 <script>
+
+    function isValidFile(file) {
+        return /\.(wav|mp3)$/i.test(file.name);
+    }
+
+
     document.addEventListener('DOMContentLoaded', () => {
         const dropArea = document.getElementById('dropArea');
         const fileInput = document.getElementById('file-upload');
         const dropAreaText = document.getElementById('dropAreaText');
         const uploadForm = document.getElementById('uploadForm');
+
+        const accessToken = localStorage.getItem("token");
+        if (!accessToken || !isTokenValid(accessToken)) {
+            dropAreaText.textContent = 'Login to upload file';
+            fileInput.value = '';
+            fileInput.disabled = true;
+            return;
+        }
 
         dropArea.addEventListener('dragover', (event) => {
             event.preventDefault();
@@ -122,19 +136,44 @@
             event.preventDefault();
             dropArea.classList.remove('dragover');
             const files = event.dataTransfer.files;
+
+            if (files.length === 0) return;
+
+            if (!isValidFile(files[0])) {
+                dropAreaText.textContent = 'Only files with extension .wav and .mp3 are allowed';
+                fileInput.value = ''; 
+                return;
+            }
+            const accessToken = localStorage.getItem("token");
+            if (!accessToken || !isTokenValid(accessToken)) {
+                dropAreaText.textContent = 'Login to upload file';
+                fileInput.value = '';
+                return;
+            }
             fileInput.files = files;
             dropAreaText.textContent = 'Файл выбран: ' + files[0].name;
         });
 
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
+                if (!isValidFile(fileInput.files[0])) {
+                    dropAreaText.textContent = 'Only files with extension .wav and .mp3 are allowed';
+                    fileInput.value = ''; 
+                    return;
+                }
+                const accessToken = localStorage.getItem("token");
+                if (!accessToken || !isTokenValid(accessToken)) {
+                    dropAreaText.textContent = 'Login to upload file';
+                    fileInput.value = '';
+                    return;
+                }
                 dropAreaText.textContent = 'Файл выбран: ' + fileInput.files[0].name;
             }
         });
 
         uploadForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Отменяем стандартное поведение формы
-            const files = fileInput.files; // Получаем файлы из input
+            event.preventDefault();
+            const files = fileInput.files; 
             handleFiles(files);
         });
 
@@ -147,7 +186,7 @@
             document.getElementById('loadingSpinner').classList.add('d-none');
             document.getElementById('downloadButton').style.display = 'none';
 
-            const user = getCookie('user');
+            const user = localStorage.getItem("user")
             console.log(user)
 
             const formData = new FormData();
@@ -186,7 +225,7 @@
                     progressBar.innerText = '100%';
 
                     document.cookie = `filename=${encodeURIComponent(fileName)}; path=/; max-age=86400`;
-                    document.cookie = `user=${encodeURIComponent(user)}; path=/; max-age=86400`;
+                    
 
                     showSplitButton()
                 } else {
@@ -246,7 +285,7 @@ document.getElementById('downloadButton').addEventListener('click', async () => 
             alert('No files');
             return;
         }
-        const user = getCookie("user");
+        const user = localStorage.getItem("user")
         const filename = getCookie("filename");
 
         const response = await fetch('download/', {

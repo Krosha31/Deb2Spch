@@ -8,6 +8,7 @@ import (
 	"Deb2Spch/internal/database"
 	"Deb2Spch/internal/upload"
 	"Deb2Spch/internal/pages"
+	"Deb2Spch/internal/profile"
 	"github.com/joho/godotenv"
 )
 
@@ -57,6 +58,7 @@ func main() {
 	mux.HandleFunc("/split/", upload.SplitHandler)
 	mux.HandleFunc("/refresh/", auth.RefreshHandler)
 	mux.HandleFunc("/download/", upload.DownloadHandler)
+	mux.HandleFunc("/history/", profile.HistoryHandler)
 
 	http.ListenAndServe(":" + port, mux)
 }

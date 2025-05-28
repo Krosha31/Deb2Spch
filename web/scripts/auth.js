@@ -21,6 +21,7 @@ async function handleLogin(event) {
 
             if (data.token) {
                 localStorage.setItem('token', data.token);
+                localStorage.setItem("user", login);
                 window.location.href = '';
             } else {
                 console.log('Сервер не вернул access токен.');

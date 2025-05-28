@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         if (logoutBtn) {
             logoutBtn.addEventListener("click", function (e) {
                 e.preventDefault();
+                clearCookies();
                 localStorage.removeItem("token");
                 window.location.href = "";
             });

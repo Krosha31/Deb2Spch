@@ -24,3 +24,34 @@ BEGIN
     WHERE users.email = input_email;
 END;
 $func$ LANGUAGE plpgsql;
+
+-- CREATE OR REPLACE FUNCTION insert_request(
+--     p_user_id varchar,
+--     p_input TEXT
+-- ) RETURNS INTEGER AS $$
+-- DECLARE
+--     new_id INTEGER;
+-- BEGIN
+--     INSERT INTO request (user_id, input)
+--     VALUES (p_user_id, p_input)
+--     RETURNING id INTO new_id;
+    
+--     RETURN new_id;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE OR REPLACE FUNCTION get_requests_by_user(input_user_id varchar)
+-- RETURNS TABLE(
+--     id integer,
+--     user_id varchar,
+--     time timestamp,
+--     input text
+-- ) AS $func$
+-- BEGIN
+--     RETURN QUERY
+--     SELECT id, user_id, time, input
+--     FROM request
+--     WHERE user_id = input_user_id
+--     ORDER BY time DESC;
+-- END;
+-- $func$ LANGUAGE plpgsql;

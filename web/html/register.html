@@ -79,6 +79,7 @@
 
                 if (data.token) {
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem("user", login)
                     window.location.href = '';
                 } else {
                     errorMessageElement.textContent = 'Сервер не вернул access токен.';

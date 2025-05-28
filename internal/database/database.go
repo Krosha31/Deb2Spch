@@ -37,10 +37,12 @@ func (database *Database) executeFunctions() error {
 	for _, file := range files {
 		sqlBytes, err := os.ReadFile(filePath + file.Name())
 		if err != nil {
+			fmt.Println(err.Error())
 			return err
 		}
 		_, err = database.db.Exec(string(sqlBytes))
 		if err != nil {
+			fmt.Println(err.Error())
 			return err
 		}
 	}
@@ -148,6 +150,40 @@ func (database *Database) GetUserByLogin(login string) (User, error) {
         return User{}, err
     }
 	return user, nil;
+}
+
+func (database *Database) InsertRequest(userID, input string) (int, error) {
+    var newID int
+    query := "SELECT insert_request($1, $2)"
+    err := database.db.QueryRow(query, userID, input).Scan(&newID)
+    if err != nil {
+        return 0, err
+    }
+    return newID, nil
+}
+
+func (database *Database) GetRequestsByUser(userID string) ([]Request, error) {
+    query := "SELECT * FROM get_requests_by_user($1)"
+    rows, err := database.db.Query(query, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var requests []Request
+    for rows.Next() {
+        var req Request
+        if err := rows.Scan(&req.ID, &req.UserID, &req.Time, &req.Input); err != nil {
+            return nil, err
+        }
+        requests = append(requests, req)
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return requests, nil
 }
 
 

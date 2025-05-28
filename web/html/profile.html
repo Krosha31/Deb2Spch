@@ -70,33 +70,57 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/header-loader.js"></script> 
+<script src="js/header-loader.js"></script> 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Получение e-mail пользователя из куки
-        const email = getCookie("user");
+    document.addEventListener("DOMContentLoaded", async () => {
+        const email = localStorage.getItem("user")
         if (email) {
             document.getElementById("user-email").textContent = email;
-            document.getElementById("user-status").textContent = "Статус: Активная подписка"; // Пример
         }
 
-        // Подгрузка истории запросов (заменить на данные с сервера)
-        const history = [
-            { date: "18.05.2025", type: "Разделение PDF", file: "document.pdf" },
-            { date: "15.05.2025", type: "Конвертация DOCX", file: "report.docx" }
-        ];
+        try {
+            const response = await fetch("history/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_id: email }),
+            });
 
-        const tbody = document.getElementById("history-body");
-        tbody.innerHTML = ""; // Очистить
-        history.forEach(entry => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${entry.date}</td>
-                <td>${entry.type}</td>
-                <td>${entry.file}</td>
-            `;
-            tbody.appendChild(row);
-        });
+            if (!response.ok) {
+                throw new Error("Ошибка при загрузке истории");
+            }
+
+            const history = await response.json();
+
+            const tbody = document.getElementById("history-body");
+            tbody.innerHTML = ""; // Очистить таблицу
+
+            if (history.length === 0) {
+                // Если пусто, можно оставить пустой tbody или вывести сообщение
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="3" class="text-center text-muted">История отсутствует</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+
+            history.forEach(entry => {
+                // Форматируем дату в ДД.ММ.ГГГГ
+                const date = new Date(entry.time);
+                const dateStr = date.toLocaleDateString("ru-RU");
+
+                // В entry.input можно хранить название файла или тип запроса, зависит от вашей модели
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td>${entry.input}</td>
+                        <td>${extractFilename(entry.input)}</td>
+                    </tr>
+                `;
+            });
+        } catch (err) {
+            console.error(err);
+        }
     });
 
     function getCookie(name) {
@@ -104,6 +128,10 @@
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
+
+    function extractFilename(input) {
+    return input;
+}
 </script>
 <script src="common/common.js"></script>
 </body>
